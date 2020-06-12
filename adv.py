@@ -11,10 +11,10 @@ world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
-map_file = "maps/test_cross.txt"
+# map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -28,36 +28,40 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
-#keep track of the rooms that we encounter
-room_map = {}
-for room in world.rooms:
-    room_map[room] = {'n': '?', 's': '?', 'w': '?', 'e': '?'}
-visted = set()
-#need a stack to put the path and next path on
-stack = []
-stack.append([player.current_room.id])
+reverse = {'n': 's', 'e': 'w', 's':'n', 'w': 'e'}
+visited = {}
+queue = {}
+prev = [None]
 
-while len(stack) > 0:
-    path = stack.pop()
-    current_room = path[-1]
-    if current_room not in visted:
-        visted.add(current_room)
-        
-    for next_room in room_graph[current_room][1].items():
-        direction = next_room[0]
-        room = next_room[1]
-        
-        #check if the next room is not visited yet
-        if room not in visted:
-            # make a copy of the room_path
-            new_room_path = list(path)
-            #append the next room to the copy of the room_path
-            new_room_path.append(room)
-            #append the copy path to the stack
-            stack.append(new_room_path)
-            
+def check_directions(room):
+    directions = []
+    if 'n' in room_graph[room][1].keys():
+        directions.append('n')
+    if 'e' in room_graph[room][1].keys():
+        directions.append('e')
+    if 'w' in room_graph[room][1].keys():
+        directions.append('w')
+    if 's' in room_graph[room][1].keys():
+        directions.append('s')
+    return directions
 
-print(visted)
+while len(visited) < len(room_graph):
+    current_room = player.current_room.id
+    
+    if current_room not in queue:
+        visited[current_room] = current_room
+        queue[current_room] = check_directions(current_room)
+    
+    if len(queue[current_room]) < 1:
+        prev_dir = prev.pop()
+        traversal_path.append(prev_dir)
+        player.travel(prev_dir)
+    else:
+        next_dir = queue[current_room].pop()
+        traversal_path.append(next_dir)
+        prev.append(reverse[next_dir])
+        player.travel(next_dir)
+
 # TRAVERSAL TEST - DO NOT MODIFY
 visited_rooms = set()
 player.current_room = world.starting_room
