@@ -11,7 +11,7 @@ world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
-# map_file = "maps/test_cross.txt"
+map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
@@ -35,25 +35,18 @@ for room in world.rooms:
 visted = set()
 #need a stack to put the path and next path on
 stack = []
-# room_path = [player.current_room.id]
 stack.append([player.current_room.id])
-my_travseal = []
 
 while len(stack) > 0:
     path = stack.pop()
-    print(path)
     current_room = path[-1]
     if current_room not in visted:
         visted.add(current_room)
-        exits = player.current_room.get_exits()
-        # for room in room_map[current_room]:
-        #     # if room in exits and room_map[current_room][room] == '?':
-        #     #     my_travseal.append(room)
-        #     print(room)
-    
+        
     for next_room in room_graph[current_room][1].items():
         direction = next_room[0]
         room = next_room[1]
+        
         #check if the next room is not visited yet
         if room not in visted:
             # make a copy of the room_path
@@ -62,8 +55,8 @@ while len(stack) > 0:
             new_room_path.append(room)
             #append the copy path to the stack
             stack.append(new_room_path)
-            traversal_path.append(direction)
-            player.travel(traversal_path[-1])
+            
+
 print(visted)
 # TRAVERSAL TEST - DO NOT MODIFY
 visited_rooms = set()
